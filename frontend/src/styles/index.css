@@ -1,0 +1,303 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   LUMORA — design tokens
+   Tailwind v4 turns these into utilities (bg-bone, text-charcoal,
+   font-display …) and exposes them as CSS variables.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-bone: #f4efe7;      /* page background, off-white */
+  --color-linen: #ebe4d9;     /* soft beige surfaces */
+  --color-sand: #d9ccb8;      /* warm neutral, hairlines on dark */
+  --color-clay: #a67c5b;      /* muted earthy accent (decorative / large text) */
+  --color-umber: #7a5a40;     /* accessible accent for small text on light */
+  --color-stone: #6a645c;     /* secondary text on light (≈5.4:1) */
+  --color-mist: #b8b0a4;      /* secondary text on dark */
+  --color-charcoal: #1d1b19;  /* primary text / dark sections */
+  --color-ink: #131211;       /* deepest dark */
+  --color-line: #d8cfc2;      /* hairline on light */
+
+  --font-display: "Cormorant Garamond", "Cormorant", "Times New Roman", Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Base ─────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --gutter: clamp(1.25rem, 4vw, 3.5rem);
+    --nav-h: 5.5rem;
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background: var(--color-bone);
+    color: var(--color-charcoal);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    font-weight: 400;
+    overflow-x: clip;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  img { max-width: 100%; height: auto; display: block; }
+
+  ::selection { background: var(--color-charcoal); color: var(--color-bone); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-umber);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .on-dark :focus-visible { outline-color: var(--color-sand); }
+
+  button { cursor: pointer; }
+}
+
+/* ─── Components ───────────────────────────────────────────── */
+@layer components {
+  .container-lux {
+    width: 100%;
+    max-width: 1520px;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .section { padding-block: clamp(5rem, 11vw, 10.5rem); }
+  .section-sm { padding-block: clamp(3.5rem, 7vw, 6.5rem); }
+
+  /* Editorial type scale — fluid, so mobile gets its own sizes instead of a shrunk desktop */
+  .display-hero {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(3.4rem, 10.6vw, 11rem);
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+  }
+  .display-xl {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.6rem, 7vw, 7.25rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .display-lg {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.2rem, 4.8vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.018em;
+  }
+  .display-md {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.75rem, 3vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+  .display-sm {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.4rem, 2vw, 2rem);
+    line-height: 1.15;
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .lead {
+    font-size: clamp(1.05rem, 1.25vw, 1.2rem);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .meta-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-stone);
+  }
+  .on-dark .meta-label { color: var(--color-mist); }
+
+  /* Animated underline for text links */
+  .link-u {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 100% 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: background-size 0.6s var(--ease-lux);
+  }
+  .link-u:hover,
+  .link-u:focus-visible,
+  .link-u[aria-current="page"] {
+    background-size: 100% 1px;
+    background-position: 0% 100%;
+  }
+
+  /* Buttons */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    min-height: 3.25rem;
+    padding: 0.95rem 1.9rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 0.5s var(--ease-lux), border-color 0.5s var(--ease-lux), background-color 0.5s var(--ease-lux);
+    white-space: nowrap;
+  }
+  /* Fill that rises from the bottom on hover */
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    transform: translateY(101%);
+    transition: transform 0.55s var(--ease-lux);
+  }
+  .btn:hover::before,
+  .btn:focus-visible::before { transform: translateY(0); }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn:disabled::before { transform: translateY(101%); }
+
+  .btn-dark { background: var(--color-charcoal); color: var(--color-bone); }
+  .btn-dark::before { background: var(--color-umber); }
+
+  .btn-outline { border: 1px solid currentColor; color: var(--color-charcoal); }
+  .btn-outline::before { background: var(--color-charcoal); }
+  .btn-outline:hover, .btn-outline:focus-visible { color: var(--color-bone); border-color: var(--color-charcoal); }
+
+  .btn-light { background: var(--color-bone); color: var(--color-charcoal); }
+  .btn-light::before { background: var(--color-sand); }
+
+  .btn-outline-light { border: 1px solid color-mix(in srgb, var(--color-bone) 55%, transparent); color: var(--color-bone); }
+  .btn-outline-light::before { background: var(--color-bone); }
+  .btn-outline-light:hover, .btn-outline-light:focus-visible { color: var(--color-charcoal); border-color: var(--color-bone); }
+
+  .btn .btn-arrow { transition: transform 0.5s var(--ease-lux); }
+  .btn:hover .btn-arrow { transform: translateX(4px); }
+
+  /* Image frame: clips zoom/parallax, shows a warm tone while loading */
+  .frame {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-linen);
+  }
+  .frame > img,
+  .frame .frame-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .zoom-img { transition: transform 1.4s var(--ease-lux); will-change: transform; }
+  .group:hover .zoom-img { transform: scale(1.045); }
+
+  .hairline { border-color: var(--color-line); }
+  .on-dark .hairline { border-color: color-mix(in srgb, var(--color-sand) 22%, transparent); }
+
+  /* Form fields — underline style */
+  .field-input {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.85rem 0 0.8rem;
+    font-size: 1.05rem;
+    color: var(--color-charcoal);
+    border-radius: 0;
+    transition: border-color 0.4s var(--ease-lux);
+  }
+  .field-input::placeholder { color: color-mix(in srgb, var(--color-stone) 70%, transparent); }
+  .field-input:hover { border-bottom-color: var(--color-sand); }
+  .field-input:focus { outline: none; border-bottom-color: var(--color-charcoal); }
+  .field-input:focus-visible { outline: none; box-shadow: 0 1px 0 0 var(--color-charcoal); }
+  .field-input[aria-invalid="true"] { border-bottom-color: #9b3b2e; }
+  textarea.field-input { resize: vertical; min-height: 8rem; line-height: 1.6; }
+
+  /* Pill radio options (project type / budget) */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.35s var(--ease-lux), color 0.35s var(--ease-lux), border-color 0.35s var(--ease-lux);
+  }
+  .pill:hover { border-color: var(--color-charcoal); }
+  input:checked + .pill { background: var(--color-charcoal); color: var(--color-bone); border-color: var(--color-charcoal); }
+  input:focus-visible + .pill { outline: 2px solid var(--color-umber); outline-offset: 3px; }
+
+  .img-fallback {
+    display: grid;
+    place-items: center;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 79px, color-mix(in srgb, var(--color-sand) 45%, transparent) 79px 80px),
+      linear-gradient(160deg, var(--color-linen), var(--color-sand));
+    color: var(--color-stone);
+  }
+
+  /* Hide scrollbars on horizontal scrollers but keep them scrollable */
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+}
+
+/* Subtle film grain for a printed, editorial feel (static — no performance cost) */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Respect reduced motion everywhere CSS transitions are used */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .group:hover .zoom-img { transform: none; }
+}
