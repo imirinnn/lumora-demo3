@@ -3,7 +3,8 @@
  * Base URL comes from VITE_API_URL (see frontend/.env.example).
  */
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
-const TIMEOUT_MS = 15000;
+// Generous timeout: free hosting (e.g. Render free) can take ~50s to wake up after being idle.
+const TIMEOUT_MS = 70000;
 
 export class ApiError extends Error {
   constructor(message, { status = 0, errors } = {}) {

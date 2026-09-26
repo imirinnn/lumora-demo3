@@ -98,7 +98,7 @@ lumora-interiors/
 │   ├── models/                 Consultation.js, Admin.js
 │   ├── routes/                 consultationRoutes.js, authRoutes.js
 │   ├── services/               mailer.js (Mailchimp / SMTP), notifyNewConsultation.js, emailTemplates/
-│   ├── scripts/                createAdmin.js, testEmail.js
+│   ├── scripts/                createAdmin.js
 │   ├── utils/ApiError.js
 │   ├── app.js                  Express app (middleware + routes)
 │   ├── server.js               connects to MongoDB, starts the server
@@ -229,7 +229,7 @@ GMass is free for a 7-day trial (50 emails) and needs a paid plan after that. It
 - `SMTP_PASS=` your GMass API key
 - `MAIL_FROM=` the Gmail address connected to GMass
 
-**Check it:** `npm run test-email` sends a sample alert to `MAIL_TO` and prints exactly what's wrong if it can't.
+**Check it:** submit the form on the website. The backend terminal prints `[mail] Sent enquiry alert …`, or `[mail] FAILED …` with the reason.
 
 ### Production build
 
@@ -311,6 +311,11 @@ Validation errors return `400` with a per-field `errors` object, which the form 
 - In MongoDB Atlas → Network Access, allow the host's IPs.
 - Run `npm run create-admin` once, either from the host's shell or locally against the production `MONGODB_URI`.
 
+**Frontend on GitHub Pages (already set up)**
+- `.github/workflows/deploy-pages.yml` builds `frontend/` and publishes it on every push to `main`.
+- In the repo, go to **Settings → Pages → Source** and choose **GitHub Actions**. The site will be at `https://<username>.github.io/<repo>/`.
+- GitHub Pages only hosts the website. The contact form and admin need the backend hosted somewhere else (e.g. Render). Add its URL as a repository variable `VITE_API_URL` (**Settings → Secrets and variables → Actions → Variables**), and add `https://<username>.github.io` to the backend's `CLIENT_ORIGIN`.
+
 **Frontend (Vercel, Netlify or Cloudflare Pages)**
 - Root directory `frontend`, build command `npm run build`, output directory `dist`.
 - Set `VITE_API_URL=https://your-api-domain` **before** building. Vite bakes it into the bundle at build time.
@@ -323,7 +328,7 @@ Validation errors return `400` with a per-field `errors` object, which the form 
 - [ ] Replace `public/og-image.jpg` (1200×630) with a branded photo.
 - [ ] Use a strong, unique `JWT_SECRET` and admin password, and serve everything over HTTPS.
 - [ ] Consider self-hosting the two Google Fonts for extra speed and privacy.
-- [ ] Set up email alerts (section 7b) on the host too, and run `npm run test-email` there once.
+- [ ] Set up email alerts (section 7b) on the host too, and submit one test enquiry.
 
 ---
 

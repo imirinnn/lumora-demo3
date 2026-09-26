@@ -42,6 +42,7 @@ const env = {
 
   /* ── Email notifications for new enquiries ─────────────────── */
   mail: {
+    // "brevo" (Brevo HTTP API — works on hosts that block SMTP, e.g. Render free),
     // "mailchimp" (Mailchimp Transactional / Mandrill), "smtp" (e.g. Gmail) or "none"
     provider: (process.env.MAIL_PROVIDER || 'none').trim().toLowerCase(),
     to: list(process.env.MAIL_TO),
@@ -49,6 +50,7 @@ const env = {
     fromName: (process.env.MAIL_FROM_NAME || 'Lumora Interiors Website').trim(),
     adminUrl: (process.env.ADMIN_URL || '').trim().replace(/\/$/, ''),
     mailchimpApiKey: (process.env.MAILCHIMP_TRANSACTIONAL_API_KEY || '').trim(),
+    brevoApiKey: (process.env.BREVO_API_KEY || '').trim(),
     mailchimpApiUrl: (process.env.MAILCHIMP_API_URL || 'https://mandrillapp.com/api/1.0').replace(/\/$/, ''),
     smtp: {
       host: (process.env.SMTP_HOST || 'smtp.gmail.com').trim(),
@@ -71,8 +73,8 @@ function list(value) {
 export function mailConfigProblems(mail = env.mail) {
   const problems = [];
   if (mail.provider === 'none') return problems;
-  if (!['mailchimp', 'smtp'].includes(mail.provider)) {
-    return [`MAIL_PROVIDER must be "mailchimp", "smtp" or "none" (got "${mail.provider}").`];
+  if (!['brevo', 'mailchimp', 'smtp'].includes(mail.provider)) {
+    return [`MAIL_PROVIDER must be "brevo", "mailchimp", "smtp" or "none" (got "${mail.provider}").`];
   }
   if (!mail.to.length) problems.push('MAIL_TO is empty — add at least one recipient.');
   if (mail.provider === 'mailchimp') {
@@ -81,6 +83,10 @@ export function mailConfigProblems(mail = env.mail) {
     else if (/@(gmail|yahoo|outlook|hotmail|icloud)\./i.test(mail.from)) {
       problems.push(`MAIL_FROM (${mail.from}) is a free email address. Mailchimp Transactional only sends from a domain you own and have verified.`);
     }
+  }
+  if (mail.provider === 'brevo') {
+    if (!mail.brevoApiKey) problems.push('BREVO_API_KEY is missing (Brevo → SMTP & API → API Keys).');
+    if (!mail.from) problems.push('MAIL_FROM is missing — use the sender email you verified in Brevo (e.g. your Gmail).');
   }
   if (mail.provider === 'smtp') {
     if (!mail.smtp.user) problems.push('SMTP_USER is missing (your Gmail address).');

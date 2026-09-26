@@ -19,11 +19,40 @@ export async function sendMail({ to = env.mail.to, subject, html, text, replyTo,
   const cleanSubject = String(subject).replace(/[\r\n]+/g, ' ').slice(0, 200);
 
   try {
+    if (mail.provider === 'brevo') return await sendViaBrevo({ mail, to, subject: cleanSubject, html, text, replyTo, tags });
     if (mail.provider === 'mailchimp') return await sendViaMailchimp({ mail, to, subject: cleanSubject, html, text, replyTo, tags });
     return await sendViaSmtp({ mail, to, subject: cleanSubject, html, text, replyTo });
   } catch (err) {
     return { sent: false, provider: mail.provider, detail: mail.provider === 'smtp' ? explainSmtpError(err, mail) : err.message || String(err) };
   }
+}
+
+/* ── Brevo (HTTPS API, free 300 emails/day) ───────────────────────────
+   Docs: https://developers.brevo.com/reference/sendtransacemail
+   Uses port 443, so it works on hosts that block SMTP (Render free tier). */
+async function sendViaBrevo({ mail, to, subject, html, text, replyTo, tags }) {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': mail.brevoApiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    signal: AbortSignal.timeout(10000),
+    body: JSON.stringify({
+      sender: { email: mail.from, name: mail.fromName },
+      to: to.map((email) => ({ email })),
+      replyTo: replyTo ? { email: replyTo } : undefined,
+      subject,
+      htmlContent: html,
+      textContent: text,
+      tags,
+    }),
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok) {
+    let why = body?.message || `HTTP ${res.status}`;
+    if (res.status === 401) why += ' → check BREVO_API_KEY (use an API key, not an SMTP key).';
+    if (/sender/i.test(why)) why += ` → add and verify ${mail.from} under Brevo → Senders.`;
+    return { sent: false, provider: 'brevo', detail: `Brevo error: ${why}` };
+  }
+  return { sent: true, provider: 'brevo', detail: `accepted (messageId ${body?.messageId || 'n/a'}) for ${to.join(', ')}` };
 }
 
 /* ── Mailchimp Transactional ─────────────────────────────────────────
@@ -112,7 +141,7 @@ export async function verifyMailSetup() {
   if (mail.provider === 'none') return console.log('[mail] Email alerts are OFF (MAIL_PROVIDER=none).');
   console.log(`[mail] Provider: ${mail.provider} · recipients: ${mail.to.join(', ') || '(none)'}`);
   if (problems.length) return console.error(`[mail] ✘ Not configured:\n  - ${problems.join('\n  - ')}`);
-  if (mail.provider !== 'smtp') return console.log('[mail] Mailchimp settings present.');
+  if (mail.provider !== 'smtp') return console.log(`[mail] ✔ ${mail.provider} settings present — sending as ${mail.from}.`);
   console.log(`[mail] Checking login to ${mail.smtp.host}:${mail.smtp.port} as ${mail.smtp.user} (app password: ${mail.smtp.pass.length} characters)…`);
   try {
     await (await getTransporter(mail)).verify();

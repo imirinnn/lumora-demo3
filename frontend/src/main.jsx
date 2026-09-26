@@ -9,7 +9,8 @@ if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'm
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* basename lets the site live in a sub-folder, e.g. GitHub Pages /lumora-demo3/ */}
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
       <App />
     </BrowserRouter>
   </StrictMode>
