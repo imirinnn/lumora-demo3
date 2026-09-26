@@ -305,6 +305,14 @@ Validation errors return `400` with a per-field `errors` object, which the form 
 
 ## 10. Deployment notes
 
+**One service for everything: Render Web Service (recommended)**
+The backend also serves the built website, so a single Node service hosts both at one URL.
+- Root Directory: *(leave empty)*
+- Build Command: `npm run build`. This installs both apps and builds `frontend/dist`.
+- Start Command: `npm start`
+- Environment: `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN=8h`, `NODE_ENV=production`, `MAIL_PROVIDER=none` (or `brevo`; Render's free plan blocks SMTP). Leave `VITE_API_URL` unset, because the site calls the API on the same URL.
+- Health Check Path: `/api/health`
+
 **Backend (Render, Railway, Fly.io or a VPS)**
 - Root directory `backend`, build command `npm install`, start command `npm start`.
 - Set every variable from `backend/.env` in the host's dashboard, with `NODE_ENV=production` and `CLIENT_ORIGIN=https://your-frontend-domain`.

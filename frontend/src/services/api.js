@@ -2,7 +2,10 @@
  * Tiny fetch wrapper for the Lumora API.
  * Base URL comes from VITE_API_URL (see frontend/.env.example).
  */
-const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+// VITE_API_URL set → use it. Not set → local dev talks to :5000; a production build talks to the
+// same server that serves the website (frontend + backend deployed as one service).
+const configured = import.meta.env.VITE_API_URL;
+const BASE_URL = (configured || (import.meta.env.DEV ? 'http://localhost:5000' : '')).replace(/\/$/, '');
 // Generous timeout: free hosting (e.g. Render free) can take ~50s to wake up after being idle.
 const TIMEOUT_MS = 70000;
 

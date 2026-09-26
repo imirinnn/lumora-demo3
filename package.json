@@ -1,0 +1,14 @@
+{
+  "name": "lumora-interiors",
+  "private": true,
+  "description": "Lumora Interiors — website (frontend) + API (backend) deployed as one Node service.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend --include=dev && npm run build --prefix frontend",
+    "start": "npm start --prefix backend",
+    "dev:api": "npm run dev --prefix backend",
+    "dev:web": "npm run dev --prefix frontend"
+  }
+}
